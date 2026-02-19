@@ -1,6 +1,7 @@
 package tn.esprit.coachingservice.Entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ public class Reservation {
 
     @ManyToOne
     @JoinColumn(name = "seance_id")
+    @JsonIgnore
     private Seance seance;
 
 
