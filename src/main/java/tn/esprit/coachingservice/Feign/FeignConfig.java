@@ -1,10 +1,11 @@
 package tn.esprit.coachingservice.Feign;
 
 import feign.Logger;
-import feign.RequestInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+// Configuration globale Feign - s'applique à tous les clients Feign
+// L'intercepteur d'auth est géré via @Component dans FeignAuthInterceptor
 @Configuration
 public class FeignConfig {
 
@@ -12,10 +13,5 @@ public class FeignConfig {
     public Logger.Level feignLoggerLevel() {
         return Logger.Level.BASIC;
     }
-
-    //@Bean
-   // public RequestInterceptor feignAuthInterceptor() {
-        //return new FeignAuthInterceptor();
-    //}
 
 }

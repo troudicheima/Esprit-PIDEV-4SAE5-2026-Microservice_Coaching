@@ -2,21 +2,25 @@ package tn.esprit.coachingservice.Feign;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
 public class FeignAuthInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
-        String token = obtainToken();
-        if (token != null) {
-            template.header("Authorization", "Bearer " + token);
+        ServletRequestAttributes attributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            String token = request.getHeader("Authorization");
+            if (token != null) {
+                template.header("Authorization", token);
+            }
         }
-    }
-
-    private String obtainToken() {
-        return null;
     }
 
 }

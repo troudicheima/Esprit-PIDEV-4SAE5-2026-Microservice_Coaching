@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import tn.esprit.coachingservice.Dto.UserDto;
 
-@FeignClient(name = "user-management-service", url = "http://localhost:8082",
+@FeignClient(name = "user-management-service", 
              fallback = UserServiceFallback.class)
 public interface UserServiceClient {
 

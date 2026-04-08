@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.coachingservice.Dto.UserDto;
 import tn.esprit.coachingservice.Entity.Seance;
 import tn.esprit.coachingservice.Service.SeanceService;
 
@@ -15,6 +16,9 @@ import java.util.List;
 public class SeanceController {
     @Autowired
     private SeanceService seanceService;
+
+    @Autowired
+    private tn.esprit.coachingservice.Feign.UserServiceClient userServiceClient;
 
     @PostMapping
     public ResponseEntity<Seance> createSeance(@RequestBody Seance seance) {
@@ -45,6 +49,32 @@ public class SeanceController {
         seanceService.deleteSeance(id);
         return ResponseEntity.noContent().build();
     }
+
+
+    @GetMapping("/tutor/{tutorId}")
+    public ResponseEntity<List<Seance>> getSeancesByTutor(@PathVariable Long tutorId) {
+        return ResponseEntity.ok(seanceService.getSeancesByTutor(tutorId));
+    }
+
+
+
+    @PostMapping("/by-tutor-email")
+    public ResponseEntity<Seance> createSeanceForTutor(
+            @RequestParam String tutorEmail,
+            @RequestBody Seance seance,
+            @RequestHeader("Authorization") String authorizationHeader) {
+
+        // Récupérer le profil du tuteur depuis user-management-service
+        UserDto tutor = userServiceClient.getUserByEmail(tutorEmail, authorizationHeader);
+        if (tutor == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        seance.setTutorId(tutor.getId());  // ID de user_profiles
+        Seance created = seanceService.createSeance(seance);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
 
 
 

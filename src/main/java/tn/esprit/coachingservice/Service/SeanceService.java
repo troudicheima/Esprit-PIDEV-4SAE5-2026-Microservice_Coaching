@@ -15,6 +15,7 @@ public class SeanceService {
     @Autowired
     private SeanceRepository seanceRepository;
 
+
     public Seance createSeance(Seance seance) {
         return seanceRepository.save(seance);
     }
@@ -42,6 +43,13 @@ public class SeanceService {
     public void deleteSeance(int id) {
         seanceRepository.deleteById(id);
     }
+
+
+
+    public List<Seance> getSeancesByTutor(Long tutorId) {
+        return seanceRepository.findByTutorId(tutorId);
+    }
+
 
 
 }

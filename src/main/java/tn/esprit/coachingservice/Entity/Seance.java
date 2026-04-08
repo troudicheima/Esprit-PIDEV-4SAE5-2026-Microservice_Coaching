@@ -19,6 +19,16 @@ public class Seance {
     private LocalDate seanceDate;     // date de la séance
     private LocalTime seanceTime;     // heure de la séance
 
+    private Long tutorId;
+
+    public Long getTutorId() {
+        return tutorId;
+    }
+
+    public void setTutorId(Long tutorId) {
+        this.tutorId = tutorId;
+    }
+
     @OneToMany(mappedBy = "seance", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
