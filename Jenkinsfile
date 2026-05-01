@@ -84,10 +84,8 @@ pipeline {
         }
         always {
             echo "🧹 Nettoyage du conteneur ${CONTAINER_NAME}..."
-            bat """
-                docker stop ${CONTAINER_NAME} || true
-                docker rm ${CONTAINER_NAME} || true
-            """
+            bat "docker stop ${CONTAINER_NAME} || exit 0"
+            bat "docker rm ${CONTAINER_NAME} || exit 0"
             echo "✅ Conteneur supprimé"
         }
     }
