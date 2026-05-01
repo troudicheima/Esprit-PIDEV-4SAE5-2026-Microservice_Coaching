@@ -7,8 +7,6 @@ pipeline {
         SERVICE_NAME = 'coaching-service'
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
         CONTAINER_NAME = "coaching-service-${BUILD_NUMBER}"
-        HOST_PORT = '5057'          // Port exposé sur l'hôte (identique à EXPOSE)
-        CONTAINER_PORT = '5057'     // Port interne du conteneur (EXPOSE 5057)
     }
 
     stages {
@@ -62,20 +60,11 @@ pipeline {
 
         stage('Create and Run Container') {
             steps {
-                // Nettoyage préalable (évite les conflits de nom)
+                echo "🚀 Création et démarrage du conteneur ${CONTAINER_NAME}..."
                 bat """
-                    docker stop ${CONTAINER_NAME} || true
-                    docker rm ${CONTAINER_NAME} || true
+                    docker run -d --name ${CONTAINER_NAME} -p 5057:5057 wallstreet/${SERVICE_NAME}:${BUILD_NUMBER}
+                    echo "✅ Conteneur ${CONTAINER_NAME} démarré sur le port 5057"
                 """
-                echo "🚀 Création et démarrage du conteneur ${CONTAINER_NAME} sur le port ${HOST_PORT}..."
-                bat """
-                    docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${CONTAINER_PORT} \
-                      -e "SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/coaching_db?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true" \
-                      -e SPRING_DATASOURCE_USERNAME=root \
-                      -e SPRING_DATASOURCE_PASSWORD=root \
-                      wallstreet/${SERVICE_NAME}:${BUILD_NUMBER}
-                """
-                echo "✅ Conteneur ${CONTAINER_NAME} démarré sur le port ${HOST_PORT}"
             }
         }
     }
@@ -86,15 +75,14 @@ pipeline {
 🎉 Pipeline CI terminé avec succès pour ${SERVICE_NAME} !
 📊 Voir les résultats SonarQube sur : ${SONAR_HOST_URL}/dashboard?id=coaching-service
 🐳 Image Docker : wallstreet/${SERVICE_NAME}:${BUILD_NUMBER}
-🚢 Conteneur "${CONTAINER_NAME}" a été exécuté sur le port ${HOST_PORT}
+🚢 Conteneur "${CONTAINER_NAME}" actif sur le port 5057
 """
         }
         failure {
-            echo "❌ Pipeline échoué pour ${SERVICE_NAME}"
+            echo "❌ Pipeline échoué"
             echo "Vérifie les tests unitaires ou la qualité du code"
         }
         always {
-            // Nettoyage final : arrêt et suppression du conteneur (évite laisser des instances)
             echo "🧹 Nettoyage du conteneur ${CONTAINER_NAME}..."
             bat """
                 docker stop ${CONTAINER_NAME} || true
