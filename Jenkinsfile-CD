@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_HUB_USER = 'troudicheima30979'
+        VM_IP = '192.168.168.128'
+    }
+    stages {
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo "Deploying Coaching Service to Kubernetes..."
+                bat "kubectl set image deployment/coaching-service coaching-service=%DOCKER_HUB_USER%/coaching-service:latest -n chaima"
+                bat "kubectl rollout status deployment/coaching-service -n chaima"
+                echo "Coaching Service Deployed"
+            }
+        }
+        stage('Verify Deployment') {
+            steps {
+                bat "kubectl get pods -n chaima -l app=coaching-service"
+                bat "kubectl get svc coaching-service -n chaima"
+            }
+        }
+    }
+    post {
+        success {
+            echo "Coaching Service CD Pipeline termine avec succes! Eureka: http://${VM_IP}:32027 Coaching-Service: http://${VM_IP}:31365"
+        }
+        failure {
+            echo "Coaching Service CD Pipeline echoue"
+        }
+    }
+}
